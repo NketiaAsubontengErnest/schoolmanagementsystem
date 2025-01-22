@@ -15,12 +15,6 @@ define('HOME', "$scheme://$server");
 define('HOMEASSET', "$scheme://$server/public/homeasset");
 
 //database variables
-
-define('DBHOST','localhost');
-define('DBNAME','emmanzag_schoolmanagement');
-define('DBUSER','emmanzag_root');
-define('DBPASS','0554013980Aa@');
-define('DBDRIVER','mysql');
  */
 
 define('DBHOST','localhost');
