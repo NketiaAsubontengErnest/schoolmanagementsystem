@@ -24,6 +24,7 @@
                                 <th class="px-4 py-3">First Name</th>
                                 <th class="px-4 py-3">Last Name</th>
                                 <th class="px-4 py-3">Status</th>
+                                <th class="px-4 py-3">Action</th>
                             </tr>
                         </thead>
                         <tbody
@@ -42,6 +43,16 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         <p class="font-semibold"><?= esc(ucfirst($row->status)) ?></p>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <p class="font-semibold">
+                                        <form method="post">
+                                            <input type="hidden" name="credited" value="<?= esc($row->credited) === '1' ? '2' : '1' ?>">
+                                            <input type="hidden" name="studentnumber" value="<?= esc($row->studentnumber) ?>">
+                                            <input type="hidden" name="id" value="<?= esc($row->id) ?>">
+                                            <button name="status" value="<?= esc(ucfirst($row->status)) === 'Present' ? 'Absent' : 'Present' ?>" class="text-purple-600">Change</button>
+                                        </form>
+                                        </p>
                                     </td>
                                 </tr>
                             <?php endforeach ?>

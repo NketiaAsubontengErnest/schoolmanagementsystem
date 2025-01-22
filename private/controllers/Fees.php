@@ -51,7 +51,7 @@ class Fees extends Controller
         ];
         $query = "SELECT f.classid, SUM(f.schoolfeeghc) AS total_school_fees, SUM(f.classfeeghc) AS total_class_fee, ( SUM(f.feedfeeghc) + ( SELECT COALESCE(SUM(amount), 0) FROM feedingarreas fa WHERE fa.semesterid =:semesterid AND fa.status = 2 AND fa.classid = f.classid )) AS total_feeding_fee FROM fees f WHERE f.semesterid =:semesterid GROUP BY f.classid;";
         $data = $fees->findSearch($query, $arr);
-        
+
         $crumbs[] = ['Dashboard', ''];
         $actives = 'expend';
         $hiddenSearch = "NOP";
@@ -80,9 +80,9 @@ class Fees extends Controller
             if ($fees->validate($_POST)) {
                 $_POST['classid'] = $id;
                 $_POST['numnotpaid'] = $_POST['numberpresent'] - $_POST['numberpaid'];
-                
+
                 $fees->insert($_POST);
-                
+
                 $_SESSION['messsage'] = "Class Fees Paid Successfully";
                 $_SESSION['status_code'] = "success";
                 $_SESSION['status_headen'] = "Good job!";
@@ -98,8 +98,8 @@ class Fees extends Controller
         if (isset($_GET['search_list'])) {
             $query = "SELECT * FROM `fees` WHERE `classid` =:classid AND `date` =:search_list";
             $arr = [
-                'classid'=> $id,
-                'search_list'=> $_GET['search_list'],
+                'classid' => $id,
+                'search_list' => $_GET['search_list'],
             ];
 
             $datafee = $fees->findSearch($query, $arr);
@@ -137,9 +137,9 @@ class Fees extends Controller
             if ($exams->validate($_POST)) {
                 $_POST['classid'] = $id;
                 $_POST['semesterid'] = $_SESSION['semester']->id;
-                                
+
                 $exams->insert($_POST);
-                
+
                 $_SESSION['messsage'] = "Class Exams Fee Paied Successfully";
                 $_SESSION['status_code'] = "success";
                 $_SESSION['status_headen'] = "Good job!";
@@ -155,11 +155,11 @@ class Fees extends Controller
         if (isset($_GET['search_list'])) {
             $query = "SELECT * FROM `examfees` WHERE `classid`=:classid AND `date` =:search_list";
             $arr = [
-                'search_list'=> $_GET['search_list'],
-                'classid'=> $id,
+                'search_list' => $_GET['search_list'],
+                'classid' => $id,
             ];
-            $datafee = $exams->findSearch($query,$arr);
-        }else{
+            $datafee = $exams->findSearch($query, $arr);
+        } else {
             $datafee = $exams->where('classid', $id);
         }
 
@@ -193,9 +193,9 @@ class Fees extends Controller
             if ($exams->validate($_POST)) {
                 $_POST['classid'] = $id;
                 $_POST['semesterid'] = $_SESSION['semester']->id;
-                                
+
                 $exams->insert($_POST);
-                
+
                 $_SESSION['messsage'] = "Class Exams Fee Paid Successfully";
                 $_SESSION['status_code'] = "success";
                 $_SESSION['status_headen'] = "Good job!";
@@ -292,8 +292,8 @@ class Fees extends Controller
 
         if (isset($_GET['search_list'])) {
             $arr = [
-                'classid'=>$id,
-                'usedate'=> $_GET['search_list']
+                'classid' => $id,
+                'usedate' => $_GET['search_list']
             ];
             $data = $fees->where_query("SELECT * FROM fees WHERE fees.date =:usedate AND fees.classid =:classid", $arr);
         } else {
@@ -327,10 +327,14 @@ class Fees extends Controller
 
         $clas = $clases->where('id', $id)[0];
         $arr = [
-            'classid'=>$id,
-            'usedate'=> $_GET['datestouse']
+            'classid' => $id,
+            'usedate' => $_GET['datestouse']
         ];
-        
+
+        if (isset($_POST['status'])) {
+            $attendances->query("UPDATE `attendances` SET `status` =:status, `credited`=:credited WHERE `id` =:id AND `studentnumber` =:studentnumber", $_POST);
+        }
+
         $data = $attendances->where_query("SELECT * FROM attendances WHERE attendances.date =:usedate AND attendances.classid =:classid", $arr);
 
         $crumbs[] = ['Dashboard', ''];
@@ -357,7 +361,7 @@ class Fees extends Controller
         $fees = new Fee();
         $attence = new Attendance();
 
-       
+
         $data = $fees->where_query("SELECT * FROM `fees` WHERE `classid`=:classid AND `date` =:usedate", [
             'classid' => $id,
             'usedate' => $_GET['datestouse'],
@@ -376,16 +380,16 @@ class Fees extends Controller
                 'classfeeghc' => $totalClassefee,
                 'usedid' => $data->id,
             ];
-            
+
             $fees->query("UPDATE `fees` SET `numberpaid`=`numberpaid`+:numberpaid ,`schoolfeeghc`=`schoolfeeghc`+:schoolfeeghc,`classfeeghc`=`classfeeghc`+:classfeeghc,`numnotpaid`=`numnotpaid`-:numnotpaid WHERE `id` =:usedid", $arr);
 
-            $attence-> query("UPDATE `attendances` SET `credited`=1 WHERE `id` =". $_POST['clearstud']);
+            $attence->query("UPDATE `attendances` SET `credited`=1 WHERE `id` =" . $_POST['clearstud']);
 
             $_SESSION['messsage'] = "Student Cleared Successfully";
             $_SESSION['status_code'] = "success";
             $_SESSION['status_headen'] = "Good job!";
 
-            return $this->redirect("fees/clearance/$id?datestouse=".$_GET['datestouse']);
+            return $this->redirect("fees/clearance/$id?datestouse=" . $_GET['datestouse']);
         }
 
         $data = $fees->where_query("SELECT * FROM `fees` WHERE `classid`=:classid AND `date` =:usedate", [
@@ -411,7 +415,7 @@ class Fees extends Controller
             'actives' => $actives,
         ]);
     }
-    
+
     function edit($id)
     {
         if (!Auth::logged_in()) {
